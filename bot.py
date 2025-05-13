@@ -1,3 +1,5 @@
+# Повторная попытка: финальная безопасная версия bot.py и создание архива
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils import executor
@@ -51,15 +53,29 @@ async def show_cart(message: types.Message):
     if not items:
         await message.reply("Ваша корзина пуста.")
     else:
-        text = "Ваша корзина:
-"
         summary = {}
         for item in items:
             summary[item] = summary.get(item, 0) + 1
-        for name, count in summary.items():
-            text += f"• {name} x{count}
-"
+        lines = [f"• {name} x{count}" for name, count in summary.items()]
+        text = "Ваша корзина:\n" + "\n".join(lines)
         await message.reply(text)
 
 if __name__ == '__main__':
     executor.start_polling(dp)
+'''
+
+# Создадим директорию и файл
+project_dir = "/mnt/data/menuforsashalovebot"
+os.makedirs(project_dir, exist_ok=True)
+with open(os.path.join(project_dir, "bot.py"), "w", encoding="utf-8") as f:
+    f.write(final_bot_code)
+
+# Создадим архив
+final_zip_path = "/mnt/data/menuforsashalovebot_ready.zip"
+with zipfile.ZipFile(final_zip_path, 'w') as zipf:
+    for root, _, files in os.walk(project_dir):
+        for file in files:
+            file_path = os.path.join(root, file)
+            zipf.write(file_path, os.path.relpath(file_path, "/mnt/data"))
+
+final_zip_path
